@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Status Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        #result { margin-top: 20px; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <h2>Track Your Order</h2>
+    <input type="text" id="orderNumber" placeholder="Enter Order ID">
+    <button onclick="checkStatus()">Check Status</button>
+    <div id="result"></div>
+
+    <script>
+        async function checkStatus() {
+            const orderNumber = document.getElementById("orderNumber").value.trim();
+            if (!orderNumber) {
+                alert("Please enter your Order ID.");
+                return;
+            }
+
+            const apiKey = "YOUR_AIRTABLE_API_KEY";
+            const baseId = "YOUR_AIRTABLE_BASE_ID";
+            const tableName = "Orders";  
+
+            const url = `https://api.airtable.com/v0/${baseId}/${tableName}?filterByFormula={Order Number}='${orderNumber}'`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: { Authorization: `Bearer ${apiKey}` }
+                });
+                const data = await response.json();
+
+                if (data.records.length > 0) {
+                    const order = data.records[0].fields;
+                    document.getElementById("result").innerHTML = `
+                        <p><strong>Latest Update:</strong><br>${order["Order Updates Log"] || "No updates yet."}</p>
+                    `;
+                } else {
+                    document.getElementById("result").innerHTML = "<p>Order not found.</p>";
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById("result").innerHTML = "<p>Error fetching order data.</p>";
+            }
+        }
+    </script>
+</body>
+</html>
