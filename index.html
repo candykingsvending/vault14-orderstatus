@@ -9,11 +9,12 @@ async function trackOrder() {
         return;
     }
 
-    const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}?filterByFormula={OrderID}='${orderId}'`;
+    const url = `https://api.airtable.com/v0/${appYsMTlnk2AAAQvB}/${Table_1}?filterByFormula={OrderID}='${orderId}'`;
 
     try {
         const response = await fetch(url, {
-            headers: { Authorization: `Bearer ${API_KEY}` }
+            headers: { Authorization: `Bearer ${
+patKPNArV5RGmfXPz}` }
         });
         const data = await response.json();
 
