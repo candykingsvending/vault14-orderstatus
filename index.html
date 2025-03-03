@@ -180,25 +180,6 @@
       color: #1565c0;
     }
     
-    .order-hold {
-      background-color: #fff3e0;
-      color: #e65100;
-    }
-    
-    .contact-link {
-      display: block;
-      margin-top: 15px;
-      text-align: center;
-      font-weight: 600;
-      color: #e65100;
-      text-decoration: underline;
-      transition: color 0.3s ease;
-    }
-    
-    .contact-link:hover {
-      color: #f57c00;
-    }
-    
     /* Loading animation */
     .loading {
       display: none;
@@ -302,18 +283,14 @@
     </div>
     
     <div id="statusMessage"></div>
-    <div id="contactContainer" style="display: none;">
-      <a href="https://vault14.candykingsid.com/order-support" class="contact-link" target="_blank">Contact Us For More Info</a>
-    </div>
     <div class="debug-info" id="debugInfo" style="display: none;"></div>
     
     <!-- For testing only -->
-    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
       <button onclick="testStatus('Received')">Test Received</button>
       <button onclick="testStatus('Processing')">Test Processing</button>
       <button onclick="testStatus('On The Way')">Test On The Way</button>
       <button onclick="testStatus('Delivered')">Test Delivered</button>
-      <button onclick="testStatus('ORDER HOLD')">Test Order Hold</button>
     </div>
   </div>
   
@@ -334,15 +311,7 @@
       updateTracker(status);
       
       document.getElementById("statusMessage").innerText = `Current Status: ${status}`;
-      
-      // Handle ORDER HOLD specially
-      if (status.toUpperCase() === "ORDER HOLD") {
-        document.getElementById("statusMessage").className = "order-hold";
-        document.getElementById("contactContainer").style.display = "block";
-      } else {
-        document.getElementById("statusMessage").className = "found";
-        document.getElementById("contactContainer").style.display = "none";
-      }
+      document.getElementById("statusMessage").className = "found";
     }
     
     // Enhanced API integration - fixed security issues with the API key
@@ -350,7 +319,6 @@
       const orderId = document.getElementById("orderId").value.trim();
       const statusMessage = document.getElementById("statusMessage");
       const trackingContainer = document.getElementById("trackingContainer");
-      const contactContainer = document.getElementById("contactContainer");
       const loading = document.getElementById("loading");
       const debugInfo = document.getElementById("debugInfo");
       
@@ -359,7 +327,6 @@
       statusMessage.className = "";
       statusMessage.innerText = "";
       trackingContainer.style.display = "none";
-      contactContainer.style.display = "none";
       debugInfo.style.display = "none";
       
       if (!orderId) {
@@ -372,7 +339,7 @@
       loading.style.display = "block";
       
       // API credentials - in a real app, these should be stored securely on the server side
-      const API_KEY = "patKPNArV5RGmfXPz.fa01ca08624a650faa4c5cafcafec620c80040ac36ade4d6fbc577f6325dc686";
+      const API_KEY = "patKPNArV5RGmfXPz.3dc76a77ce9daf522cb8f646822610589b56ea4903a77a9c7e7b2d4464fcaf84";
       const BASE_ID = "appYsMTlnk2AAAQvB";
       const TABLE_NAME = "Orders";
       
@@ -407,33 +374,23 @@
         
         // Turn on debugging for troubleshooting
         debugInfo.textContent = `API Status: "${status}", Type: ${typeof status}`;
-        debugInfo.style.display = "none"; // Set to block for debugging
+        debugInfo.style.display = "block";
         
-        // Show tracking container for normal statuses
-        if (status.toUpperCase() !== "ORDER HOLD") {
-          trackingContainer.style.display = "block";
-        }
+        // Show tracking container
+        trackingContainer.style.display = "block";
         
-        // Update tracker with animation
+        // Update tracker with animation (explicitly handle all possible statuses)
         updateTracker(status);
         
         // Show additional order information if available
         let statusText = `Current Status: ${status}`;
         
-        if (order.EstimatedDelivery && status.toUpperCase() !== "ORDER HOLD") {
+        if (order.EstimatedDelivery) {
           statusText += `\nEstimated Delivery: ${order.EstimatedDelivery}`;
         }
         
         statusMessage.innerText = statusText;
-        
-        // Special handling for ORDER HOLD
-        if (status.toUpperCase() === "ORDER HOLD") {
-          statusMessage.className = "order-hold";
-          contactContainer.style.display = "block";
-        } else {
-          statusMessage.className = "found";
-          contactContainer.style.display = "none";
-        }
+        statusMessage.className = "found";
         
       } catch (error) {
         console.error("Error fetching order:", error);
@@ -446,12 +403,6 @@
     function updateTracker(status) {
       // Reset all steps first
       document.querySelectorAll(".step").forEach(step => step.classList.remove("active"));
-      
-      // Handle ORDER HOLD specially - don't show any steps
-      if (status.toUpperCase() === "ORDER HOLD") {
-        document.getElementById("progressLine").style.width = "0%";
-        return;
-      }
       
       // Map statuses explicitly to steps
       let stepNumber = 0;
